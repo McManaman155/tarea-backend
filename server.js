@@ -15,10 +15,11 @@ app.post('/submit', (req, res) => {
     : [];
 
   submissions.push({
+    name: data.name || "Anónimo",  // 👈 Nuevo campo: nombre del alumno
     text: data.text,
     date: new Date().toISOString(),
-    status: "Pendiente",
-    comment: ""
+    status: "Pendiente",           // 👈 Nuevo campo: estado inicial
+    comment: ""                    // 👈 Nuevo campo: comentario inicial vacío
   });
 
   fs.writeFileSync('submissions.json', JSON.stringify(submissions, null, 2));
@@ -35,7 +36,7 @@ app.get('/submissions', (req, res) => {
   }
 });
 
-// NUEVA Ruta para guardar cambios de profesor
+// Ruta para guardar cambios de profesor (estado y comentario)
 app.post('/save', (req, res) => {
   const updatedSubmissions = req.body;
   fs.writeFileSync('submissions.json', JSON.stringify(updatedSubmissions, null, 2));
