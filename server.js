@@ -4,12 +4,14 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Middleware para permitir CORS y preflight
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"],
 }));
-app.options('*', cors()); // Permitir todas las preflight requests
+
+app.options('*', cors()); // Permitir todas las preflight OPTIONS
 
 app.use(express.json());
 
@@ -21,11 +23,11 @@ app.post('/submit', (req, res) => {
     : [];
 
   submissions.push({
-    name: data.name || "Anónimo",  // 👈 Nuevo campo: nombre del alumno
+    name: data.name || "Anónimo",
     text: data.text,
     date: new Date().toISOString(),
-    status: "Pendiente",           // 👈 Nuevo campo: estado inicial
-    comment: ""                    // 👈 Nuevo campo: comentario inicial vacío
+    status: "Pendiente",
+    comment: ""
   });
 
   fs.writeFileSync('submissions.json', JSON.stringify(submissions, null, 2));
@@ -42,13 +44,14 @@ app.get('/submissions', (req, res) => {
   }
 });
 
-// Ruta para guardar cambios de profesor (estado y comentario)
+// Ruta para guardar cambios de profesor
 app.post('/save', (req, res) => {
   const updatedSubmissions = req.body;
   fs.writeFileSync('submissions.json', JSON.stringify(updatedSubmissions, null, 2));
   res.json({ message: 'Actualizado correctamente' });
 });
 
-app.listen(PORT, () => {
+// 🚀 Escuchar en 0.0.0.0 para Railway
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
 });
