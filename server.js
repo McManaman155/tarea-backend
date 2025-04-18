@@ -9,6 +9,8 @@ app.use(cors({
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"],
 }));
+app.options('*', cors()); // Permitir todas las preflight requests
+
 app.use(express.json());
 
 // Ruta para recibir nuevas entregas
