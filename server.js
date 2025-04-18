@@ -4,18 +4,27 @@ const cors = require('cors');
 const app = express();
 
 // Middleware para permitir CORS
-app.use(cors());
-app.options('*', cors());
-
-// Middleware para procesar JSON en body
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+}));
 app.use(express.json());
 
-// Ruta raíz para confirmar que el servidor está activo
+// 🔥 RESPONDER BIEN A CUALQUIER PRE-FLIGHT (OPTIONS)
+app.options('*', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  res.sendStatus(200);
+});
+
+// Ruta principal para confirmar que el servidor está activo
 app.get('/', (req, res) => {
   res.send('🚀 Servidor backend activo en Render.');
 });
 
-// Nueva versión reforzada de la ruta /submit
+// Ruta para recibir nuevas entregas
 app.post('/submit', (req, res) => {
   try {
     const { name, text } = req.body;
@@ -88,9 +97,10 @@ app.post('/save', (req, res) => {
   }
 });
 
-// Escuchar en puerto dinámico asignado por Render
+// 🚀 Escuchar en el puerto que Render asigne
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
+
