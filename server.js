@@ -3,18 +3,24 @@ const fs = require('fs');
 const cors = require('cors');
 const app = express();
 
-// Configurar CORS completo
+// Middleware para permitir CORS
 app.use(cors());
-app.options('*', cors()); // Permitir todas las OPTIONS
+app.options('*', cors());
 
+// Middleware para procesar JSON
 app.use(express.json());
+
+// Ruta principal (opcional para mostrar algo en /)
+app.get('/', (req, res) => {
+  res.send('🚀 Servidor backend activo en Render.');
+});
 
 // Ruta para recibir nuevas entregas
 app.post('/submit', (req, res) => {
   const { name, text } = req.body;
 
   if (!name || !text) {
-    return res.status(400).json({ error: 'Faltan datos' });
+    return res.status(400).json({ error: 'Faltan datos en la entrega' });
   }
 
   let submissions = [];
@@ -34,10 +40,10 @@ app.post('/submit', (req, res) => {
 
   fs.writeFileSync('submissions.json', JSON.stringify(submissions, null, 2));
 
-  res.status(200).json({ message: 'Entrega guardada' });
+  res.status(200).json({ message: 'Entrega recibida correctamente' });
 });
 
-// Ruta para ver todas las entregas
+// Ruta para listar todas las entregas
 app.get('/submissions', (req, res) => {
   if (fs.existsSync('submissions.json')) {
     const fileData = fs.readFileSync('submissions.json');
@@ -48,7 +54,7 @@ app.get('/submissions', (req, res) => {
   }
 });
 
-// Ruta para guardar correcciones del profesor
+// Ruta para actualizar entregas (profesor)
 app.post('/save', (req, res) => {
   const updatedSubmissions = req.body;
 
@@ -58,11 +64,13 @@ app.post('/save', (req, res) => {
 
   fs.writeFileSync('submissions.json', JSON.stringify(updatedSubmissions, null, 2));
 
-  res.status(200).json({ message: 'Cambios guardados' });
+  res.status(200).json({ message: 'Cambios guardados correctamente' });
 });
 
-// Escuchar en el puerto que Railway asigna
+// 🚀 Aquí la magia: escuchar en puerto dinámico
 const PORT = process.env.PORT || 4000;
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
+
