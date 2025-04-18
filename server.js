@@ -11,9 +11,12 @@ app.use(cors({
   allowedHeaders: ["Content-Type"],
 }));
 
-app.options('*', cors()); // Permitir todas las preflight OPTIONS
-
 app.use(express.json());
+
+// 🔥 Añadir ruta OPTIONS manual
+app.options('*', (req, res) => {
+  res.sendStatus(200);
+});
 
 // Ruta para recibir nuevas entregas
 app.post('/submit', (req, res) => {
